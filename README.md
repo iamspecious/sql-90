@@ -58,7 +58,7 @@ Before day 1 I took a diagnostic to see where I was starting from. The questions
 | Path | What it holds |
 |---|---|
 | [days/](days/) | One file per session, `day-NN.sql`, with my queries and comments |
-| [seed/](seed/) | The practice dataset I query against |
+| [seed/](seed/) | The practice dataset I query against: [sql_practice_seed.sql](seed/sql_practice_seed.sql), run once in the Supabase SQL editor |
 | [baseline/](baseline/) | The day-0 diagnostic |
 | [DEVLOG.md](DEVLOG.md) | Weekly write-ups, newest first |
 | [errors.md](errors.md) | Every mistake worth remembering and the rule it taught me |
