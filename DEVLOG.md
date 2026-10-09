@@ -24,7 +24,7 @@ Template. Copy this block to the top of the entries and fill it in.
 
 ## Week 1: Read before you write (6 Oct to 12 Oct)
 
-*In progress. Days 1 to 3 so far, the full entry gets written on Sunday. Full notes: [day 1](days/day-01.md), [day 2](days/day-02.md), [day 3](days/day-03.md).*
+*In progress. Days 1 to 4 so far, the full entry gets written on Sunday. Full notes: [day 1](days/day-01.md), [day 2](days/day-02.md), [day 3](days/day-03.md), [day 4](days/day-04.md).*
 
 **What I covered**
 
@@ -38,6 +38,8 @@ Day 2 was `SELECT` and `WHERE`. I finished SQLBolt lessons 1 to 3, then did edit
 
 Day 3 was NULL. NULL means unknown, not zero or empty, so any comparison with it is unknown too, and `WHERE` quietly drops those rows. I saw it on my own invoices, where the pending invoice 107 disappears from "every invoice that isn't 25". Then I explained it to an imaginary customer, wrote the fix, and looked at `COALESCE`.
 
+Day 4 was `ORDER BY` and `LIMIT`: SQLBolt lesson 4, then drills on where NULLs land in a sort, a top 3, why ties come back in any order, and adding a tiebreaker. The check was my own diagnostic result from day 0.
+
 **What broke**
 
 Nothing in the setup, but my understanding wobbled. After running the seed it showed up as a saved query called "SQL Sample Data", and I thought that might be the data itself, so editing it would break everything. I also couldn't work out where the database came from, because no step ever said "create a database".
@@ -50,6 +52,8 @@ The `BETWEEN` drill took four goes, all about quotes. No quotes means Postgres r
 
 My first customer explanation of NULL had the right idea but said `<>` means "around that number", and my marbles analogy never got to the point.
 
+On day 4 I expected the 599 at the top of a `DESC` sort, and the NULL came first. I went back and forth on whether `NULLS LAST` changes a top 3. And my first tiebreaker replaced the amount sort instead of adding to it. I'd also picked the wrong oldest invoice because I compared days and skipped the month.
+
 **What clicked**
 
 The seed is a recipe, not the data. It ran once, built the tables and filled them, and now the tables exist on their own. The saved snippet is just text. The database only changes when a statement actually runs. I proved it by running `SELECT * FROM accounts;` in a fresh tab with the seed closed.
@@ -61,6 +65,10 @@ Also: you can spot a NULL by eye, but a broken link between two tables only show
 `WHERE` goes down the table one row at a time and asks yes or no. Yes stays, no is gone. When I'm unsure what a query returns, I walk the table by hand. And `WHERE` only keeps a definite yes, which is exactly why NULL rows vanish without an error. A customer whose query silently comes back empty may well have `= NULL` buried in it.
 
 `COALESCE` changes what's shown, not what's stored, and the fallback has to be true. The question every time: is my fallback true, or just convenient?
+
+`LIMIT` never looks at values, only at positions after sorting. Sort first, then cut. In Postgres NULL sorts as the biggest value, so it sits on top of a `DESC` list and takes a top 3 slot unless I say `NULLS LAST`. Rows that tie can come back in any order, so a top N with ties can change between runs. That's a real ticket: "my query keeps changing". A tiebreaker after a comma fixes it.
+
+The best part: on Monday I couldn't explain why Birch and Ember sat on top of my diagnostic result. By Friday I could, and I knew the fix.
 
 **What changed in my approach**
 
