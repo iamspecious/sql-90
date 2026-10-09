@@ -3,7 +3,7 @@
 **Date:** Tue 6 Oct 2026
 **Week 1:** Read before you write
 **Time:** about 30 minutes
-**Confidence (1-5):** _fill in_
+**Confidence (1-5):** 3
 
 ## Goal
 

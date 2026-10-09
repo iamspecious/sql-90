@@ -3,7 +3,7 @@
 **Date:** Thu 8 Oct 2026
 **Week 1:** Read before you write
 **Status:** Done. Check passed.
-**Confidence (1-5):** _fill in_
+**Confidence (1-5):** 3
 
 ## Goal
 

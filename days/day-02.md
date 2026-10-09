@@ -3,6 +3,7 @@
 **Dates:** Wed 7 Oct 2026 (part 1), Thu 8 Oct 2026 (part 2)
 **Week 1:** Read before you write
 **Status:** Done. 2 of 3 check predictions right, rewrite correct.
+**Confidence (1-5):** 3
 
 ## Goal
 
