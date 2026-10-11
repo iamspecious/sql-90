@@ -22,62 +22,43 @@ Template. Copy this block to the top of the entries and fill it in.
 
 <!-- Entries start below this line -->
 
-## Week 1: Read before you write (6 Oct to 12 Oct)
+## Week 1: Read before you write (6 to 11 Oct 2026)
 
-*In progress. Days 1 to 4 so far, the full entry gets written on Sunday. Full notes: [day 1](days/day-01.md), [day 2](days/day-02.md), [day 3](days/day-03.md), [day 4](days/day-04.md).*
+**Sessions:** 5 of 5 done
+**Review result:** 3 of 4
 
 **What I covered**
 
-Day 1 was setup. Before writing any queries I wanted to be sure the environment was actually right, so the whole session was getting a practice database built and checking it.
+Setting up a real Postgres database in Supabase and loading my own practice data. Then the basics I'd got rusty on: `SELECT`, `WHERE`, comparison operators, `IN`, `BETWEEN`, NULL and how it behaves, `COALESCE`, `ORDER BY`, `LIMIT`, and tiebreakers.
 
-I made a free Supabase project (Frankfurt) and ran the seed file (`seed/sql_practice_seed.sql`) once in the SQL Editor. It builds five tables: accounts, invoices, users, employees, and events, which has 200,000 generated rows saved for the performance weeks. Row Level Security is on for every table with no policies, so none of it is reachable through the project's public API. The SQL Editor runs as the `postgres` role, so I can still query everything from there.
+**Where I started**
 
-Row counts only prove the data arrived, so I ran three more checks my coach gave me: RLS is on for all five tables, the events table covers 10 users from 1 January to late September, and the two planted problems in invoices are there.
-
-Day 2 was `SELECT` and `WHERE`. I finished SQLBolt lessons 1 to 3, then did edit-this-query drills on my own `accounts` and `invoices` tables: adding a column, filtering by country, "not on the free plan", and invoices over 25. I stopped after four drills and finished the rest the next morning: `BETWEEN` for a date range, `IN` for a list of plans, and a check where I predicted row counts before running three queries. I got 2 of 3.
-
-Day 3 was NULL. NULL means unknown, not zero or empty, so any comparison with it is unknown too, and `WHERE` quietly drops those rows. I saw it on my own invoices, where the pending invoice 107 disappears from "every invoice that isn't 25". Then I explained it to an imaginary customer, wrote the fix, and looked at `COALESCE`.
-
-Day 4 was `ORDER BY` and `LIMIT`: SQLBolt lesson 4, then drills on where NULLs land in a sort, a top 3, why ties come back in any order, and adding a tiebreaker. The check was my own diagnostic result from day 0.
+On day 0 I did a diagnostic. I could partly read a query but couldn't explain its output: I didn't know why two accounts with no invoices came out at the top. I couldn't write the other two tasks at all. I froze on a blank page, which is the same thing that happened in a real interview the week before.
 
 **What broke**
 
-Nothing in the setup, but my understanding wobbled. After running the seed it showed up as a saved query called "SQL Sample Data", and I thought that might be the data itself, so editing it would break everything. I also couldn't work out where the database came from, because no step ever said "create a database".
-
-And I missed one of the planted problems. I spotted invoice 107 with no amount in the Table Editor, but not invoice 108, which belongs to an account that doesn't exist. Nothing in that row looks wrong on its own.
-
-On day 2 my syntax broke a lot. I used double quotes around a text value, which Postgres reads as a column name. I wrote `NOT =`, which isn't a thing. I put columns in the `WHERE` instead of the `SELECT`. All three are in [errors.md](errors.md).
-
-The `BETWEEN` drill took four goes, all about quotes. No quotes means Postgres reads 2026-09-01 as a sum. One pair of quotes round the whole range means it reads it as one broken date. In the check I got the `AND` and `OR` one wrong, because `AND` happens first. On day 3 I wrote `= NULL` in SQLBolt, and I flipped `<>` to mean "exactly" a day after using it correctly. Those are in the errors log too.
-
-My first customer explanation of NULL had the right idea but said `<>` means "around that number", and my marbles analogy never got to the point.
-
-On day 4 I expected the 599 at the top of a `DESC` sort, and the NULL came first. I went back and forth on whether `NULLS LAST` changes a top 3. And my first tiebreaker replaced the amount sort instead of adding to it. I'd also picked the wrong oldest invoice because I compared days and skipped the month.
+* Quotes. I used double quotes for text. In Postgres, double quotes mean a column name, so `"DE"` makes it look for a column called DE. Text and dates take single quotes, one pair per value.
+* `<>`. I read it as "equal". It means "not equal".
+* `= NULL`. It never matches anything and doesn't error. You need `IS NULL`.
+* AND and OR. I assumed they run left to right. `AND` happens first. I got this wrong on Thursday and right on Sunday.
+* NULL in sorting. I assumed the biggest real number would come first with `DESC`. In Postgres, NULL sorts as the biggest value, so it comes first unless you add `NULLS LAST`.
+* Reading the whole question. In the review I wrote a correct filter and forgot the sort the question asked for.
 
 **What clicked**
 
-The seed is a recipe, not the data. It ran once, built the tables and filled them, and now the tables exist on their own. The saved snippet is just text. The database only changes when a statement actually runs. I proved it by running `SELECT * FROM accounts;` in a fresh tab with the seed closed.
+* The yes/no walk. `WHERE` goes down the table one row at a time and asks yes or no. Only a definite yes survives. That one idea explains most of the week, including why NULL rows disappear: unknown isn't yes.
+* `LIMIT` cuts by position, not value. Sort first, then cut.
+* Ties come back in any order. A top-3 query gave me invoice 103 in third place for no real reason. Adding a tiebreaker column makes the answer the same every time.
+* `COALESCE` is a judgement call. I questioned whether swapping NULL for 0 was honest. It changes what's shown, not what's stored, and it's only right when the fallback is actually true.
 
-Also: you can spot a NULL by eye, but a broken link between two tables only shows up when you query across them.
+**What changed in how I work**
 
-`SELECT` controls columns, `WHERE` controls rows. Adding a column never changes the row count. And my row-count predictions were right even when my syntax wasn't: I called 2 rows for `> 25` and 6 for `>= 25`, and both were correct. My reasoning is ahead of my syntax, and the syntax is the easier half to fix.
+* One step per message. Getting a whole day's material at once didn't work for me. Switching to one instruction, do it, get feedback, next step was the biggest improvement of the week.
+* Always show the data next to the question. I nearly worked off the wrong table once. Every question now comes with its table.
+* Stop when I'm tired. I stopped partway through Day 2 and finished the next day. Practising tired just teaches my brain that SQL feels hard.
+* Predict before running. Writing down what I expect before I hit Run is what exposed most of my mistakes.
+* Explaining to customers depends on the customer. A non-technical person needs plain language or an analogy. A developer on Supabase would find an analogy patronising. Either way, give the fix, not just the reason.
 
-`WHERE` goes down the table one row at a time and asks yes or no. Yes stays, no is gone. When I'm unsure what a query returns, I walk the table by hand. And `WHERE` only keeps a definite yes, which is exactly why NULL rows vanish without an error. A customer whose query silently comes back empty may well have `= NULL` buried in it.
+**Next week**
 
-`COALESCE` changes what's shown, not what's stored, and the fallback has to be true. The question every time: is my fallback true, or just convenient?
-
-`LIMIT` never looks at values, only at positions after sorting. Sort first, then cut. In Postgres NULL sorts as the biggest value, so it sits on top of a `DESC` list and takes a top 3 slot unless I say `NULLS LAST`. Rows that tie can come back in any order, so a top N with ties can change between runs. That's a real ticket: "my query keeps changing". A tiebreaker after a comma fixes it.
-
-The best part: on Monday I couldn't explain why Birch and Ember sat on top of my diagnostic result. By Friday I could, and I knew the fix.
-
-**What changed in my approach**
-
-Checking the setup properly before writing any queries, not just trusting the row counts. One new query tab per session, named by day, and the seed renamed so I only open it on purpose. Running it again wipes and rebuilds everything, so it's my reset button.
-
-The big one: one step per message. Partway through day 2 I got a whole day's material at once and couldn't tell where I was meant to be running things. One instruction, I do it, I paste my query, I get feedback, next step. That's the format from now on.
-
-I also stopped when I got tired instead of pushing through. Practising tired teaches my brain that SQL feels hard, and that's the thing I'm trying to undo.
-
-Before writing a query I ask what should count. Should failed invoices be in September's list? That's the first question in a real ticket too. I also asked for the data table to be shown with every question, because I nearly worked off the wrong one.
-
-And I pushed back on a rewrite that was too technical for the customer I'd pictured. A non-technical customer needs plain language. A Supabase customer is usually a developer who'd find an analogy a bit patronising. Pick the register for the person, and always give the fix, not just the reason.
+Joins. That's where the diagnostic tripped me up most, especially LEFT JOIN, and filters in `ON` versus `WHERE`.
